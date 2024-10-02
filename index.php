@@ -1,13 +1,27 @@
 <?php
-if(isset($_POST ['email'])) {
 
-    include('conexao.php');
+include('conexao.php');
+
+if(!isset($_SESSION)){
+    session_start();
+}
+if(!isset($_SESSION['usuario'])){
+    die('Você não está logado. <a href="login.php">Clique aqui</a> para logar.');
+}
+
+if(isset($_POST ['email'])) {
 
     $email = $_POST['email'];
     $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
 
     $mysqli->query("INSERT INTO senhas(email, senha) VALUES ('$email','$senha')");
 }
+
+$id = $_SESSION['usuario'];
+$sql_query = $mysqli->query("SELECT * FROM senhas WHERE id ='$id'") or die($mysqli->error);
+$usuario = $sql_query->fetch_assoc();
+  
+
 ?>
 
 <!DOCTYPE html>
@@ -18,11 +32,19 @@ if(isset($_POST ['email'])) {
     <title>Criptografia</title>
 </head>
 <body>
-    Cadastrar Senha
+    <p>Bem Vindo, <?php echo $usuario['nome'];?></p>
+    <h1>Cadastro de Usuários</h1>
     <form action=""method="post">
-        <input type="text" name="email">
-        <input type="text" name="senha">
+        <p>
+            <label for="">E-mail</label>
+            <input type="text" name="email">
+        </p>
+        <p>
+            <label for="">Senha</label>
+            <input type="text" name="senha">
+        </p>
         <button type="submit">Salvar Senha</button>
         </form>
+        <p><a href="logout.php">Sair</a></p>
 </body>
 </html>
